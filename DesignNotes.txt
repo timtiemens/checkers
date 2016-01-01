@@ -1,0 +1,5 @@
+
+Issues:
+ o model-view separation - allow multiple views, at different sizes
+   - allow view to be purpose-driven for "display", not mixed with game logic
+ o make "dynamic size" checker and checker square and checker board

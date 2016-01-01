@@ -1,8 +1,11 @@
-package checkers;
+package checkers.main;
 
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+
+import checkers.gui.BoardPainter;
+import checkers.model.Board;
 
 /**
  * From http://www.javaworld.com/article/3014190/apis/checkers-anyone.html
@@ -16,11 +19,10 @@ public class Checkers extends JFrame
       super(title);
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-      Board board = new Board();
-      board.add(new Checker(CheckerType.RED_REGULAR), 4, 1);
-      board.add(new Checker(CheckerType.BLACK_REGULAR), 6, 3);
-      board.add(new Checker(CheckerType.RED_KING), 5, 6);
-      setContentPane(board);
+      Board board = Board.createCheckerBoardStandardStarting();
+
+      BoardPainter boardPaint = new BoardPainter(board);
+      setContentPane(boardPaint);
 
       pack();
       setVisible(true);

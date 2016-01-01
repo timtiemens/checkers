@@ -2,12 +2,20 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = 'checkers.Checkers'
+mainClassName = 'checkers.main.Checkers'
 
 def javaVersion = JavaVersion.VERSION_1_8;
 sourceCompatibility = javaVersion;
 targetCompatibility = javaVersion;
 
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+}
+
+repositories {
+    mavenCentral()
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
