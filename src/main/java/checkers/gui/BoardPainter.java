@@ -1,8 +1,6 @@
 package checkers.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -11,14 +9,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
 import checkers.model.Board;
-import checkers.model.Board.Square;
-import checkers.model.Checker;
-import checkers.model.CheckerSide;
+import checkers.model.Piece;
 
 public class BoardPainter extends JComponent {
     private static final long serialVersionUID = 1L;
@@ -26,20 +21,20 @@ public class BoardPainter extends JComponent {
     private Board board;
 
     // Helper: decide on square color
-    private ColorStrategy squarePainter;
+    private PiecePaintStrategy piecePainter;
 
     private int currentPieceSize;
 
     // encapsulate all of the "drag" information:
     private DragHelper dragHelper;
 
-    public BoardPainter(Board board) {
+    public BoardPainter(Board board, PiecePaintStrategy piecePainter) {
         super();
         this.board = board;
         this.currentPieceSize = 50;
 
         // helper aka "strategies"
-        squarePainter = new ColorStrategy(board);
+        this.piecePainter = piecePainter;
 
         // track dragging, set up listeners, etc.:
         dragHelper = new DragHelper();
@@ -77,7 +72,7 @@ public class BoardPainter extends JComponent {
         for (Point point : board.generatePointsTopDownLeftRight()) {
             int gx = (point.x - 1) * squareSize;
             int gy = (point.y - 1) * squareSize;
-            g.setColor(squarePainter.getColorForPoint(point));
+            g.setColor(piecePainter.getColorForPoint(point));
             g.fillRect(gx, gy, squareSize, squareSize);
         }
     }
@@ -91,7 +86,7 @@ public class BoardPainter extends JComponent {
 
     private void paintPiecesNotBeingDragged(Graphics g) {
         for (Point point : board.generatePointsTopDownLeftRight()) {
-            Checker piece = board.getPiece(point);
+            Piece piece = board.getPiece(point);
             if (piece != null) {
                 if (! dragHelper.isPieceBeingDragged(piece)) {
                     drawPiece(point, piece, g);
@@ -115,7 +110,7 @@ public class BoardPainter extends JComponent {
     }
 
 
-    public void drawPiece(Point point, Checker piece, Graphics g) {
+    public void drawPiece(Point point, Piece piece, Graphics g) {
         final int squareSize = getSquareSize();
 
         int cx = (point.x - 1) * squareSize + squareSize / 2;
@@ -126,70 +121,13 @@ public class BoardPainter extends JComponent {
 
     // "lower level" draw, used by "Dragging" code.
     // allows piece to be drawn not centered on a square.
-    public void drawPiece(int cx, int cy, Checker piece, Graphics g) {
+    public void drawPiece(int cx, int cy, Piece piece, Graphics g) {
+        final int squareSize = getSquareSize();
         final int pieceSize = getCurrentPieceSize();
-        final int x = cx - pieceSize / 2;
-        final int y = cy - pieceSize / 2;
 
-        g.setColor(squarePainter.getColorForPiece(piece));
-        g.fillOval(x,  y, pieceSize, pieceSize);
-        g.setColor(squarePainter.getColorForPieceBorder());
-        g.drawOval(x,  y, pieceSize, pieceSize);
-
-        if (piece.isKing()) {
-            g.setColor(squarePainter.getColorForKingMaker());
-            final String marker = "K";
-
-            // adjust cx, cy for size of the "K"
-            FontMetrics fm = g.getFontMetrics(g.getFont());
-            Rectangle2D bounds = fm.getStringBounds(marker, g);
-            int width = (int) bounds.getWidth();
-            int height = (int) bounds.getHeight();
-            int atx = cx - (width / 2);
-            int aty = cy + (height / 3); // TODO: /2 seems "too low"
-            g.drawString(marker, atx, aty);
-        }
+        piecePainter.draw(cx, cy, piece, g, squareSize, pieceSize);
     }
 
-
-    public static class ColorStrategy {
-        private final Board board;
-        public ColorStrategy(Board b) {
-            board = b;
-        }
-
-        public Color getColorForPoint(Point point) {
-            Square square = board.getSquare(point);
-
-            // The official rules say pieces go on dark.
-            // But this implementation puts them on light.
-            if (square.equalsType(Square.NOT_IN_PLAY)) {
-                return Color.BLACK;
-            } else if (square.equalsType(Square.IN_PLAY)) {
-                return Color.WHITE;
-            } else {
-                throw new RuntimeException("cannot get color for point=" + point + " square=" + square);
-            }
-        }
-
-        public Color getColorForPiece(Checker piece) {
-            if (piece.isSide(CheckerSide.BLACK)) {
-                return Color.BLACK;
-            } else if (piece.isSide(CheckerSide.RED)) {
-                return Color.RED;
-            } else {
-                throw new RuntimeException("cannot get color for piece=" + piece + " side=" + piece.getSide());
-            }
-        }
-
-        public Color getColorForPieceBorder() {
-            return Color.WHITE;
-        }
-
-        public Color getColorForKingMaker() {
-            return Color.WHITE;
-        }
-    }
 
     // "instance" inner class, so it has access to outer
     private class DragHelper {
@@ -209,7 +147,7 @@ public class BoardPainter extends JComponent {
         public void paintPieceBeingDragged(Graphics g) {
             if (inDrag) {
                 if (dragging != null) {
-                    Checker piece = board.getPiece(dragging);
+                    Piece piece = board.getPiece(dragging);
                     drawPiece(draggingCx, draggingCy, piece, g);
                 } else {
                     throw new RuntimeException("indrag is true, but dragging is null");
@@ -219,7 +157,8 @@ public class BoardPainter extends JComponent {
             }
 
         }
-        public Checker getPieceBeingDragged() {
+
+        public Piece getPieceBeingDragged() {
             if (dragging != null) {
                 return board.getPiece(dragging);
             } else {
@@ -227,8 +166,8 @@ public class BoardPainter extends JComponent {
             }
         }
 
-        public boolean isPieceBeingDragged(Checker piece) {
-            if (piece.equalsType(getPieceBeingDragged())) {
+        public boolean isPieceBeingDragged(Piece piece) {
+            if (piece.equals(getPieceBeingDragged())) {
                 return true;
             } else {
                 return false;

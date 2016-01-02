@@ -5,7 +5,10 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 
 import checkers.gui.BoardPainter;
+import checkers.gui.PiecePaintStrategy;
+import checkers.gui.PiecePaintStrategyCheckers;
 import checkers.model.Board;
+import checkers.model.BoardFactoryCheckers;
 
 /**
  * From http://www.javaworld.com/article/3014190/apis/checkers-anyone.html
@@ -19,9 +22,10 @@ public class Checkers extends JFrame
       super(title);
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-      Board board = Board.createCheckerBoardStandardStarting();
+      Board board = BoardFactoryCheckers.createCheckerBoardStandardStarting();
+      PiecePaintStrategy piecePainter = new PiecePaintStrategyCheckers(board);
 
-      BoardPainter boardPaint = new BoardPainter(board);
+      BoardPainter boardPaint = new BoardPainter(board, piecePainter);
       setContentPane(boardPaint);
 
       pack();

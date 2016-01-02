@@ -1,7 +1,7 @@
 package checkers.model;
 
 //@MapKeyCapable -- i.e. is capable of being used as a key in a Map
-public class Checker {
+public class Checker implements Piece {
     // quick implementation of "id"
     private static int globalCheckerId = 1;
 
