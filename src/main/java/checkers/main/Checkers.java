@@ -1,8 +1,7 @@
 package checkers.main;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import checkers.gui.BoardPainter;
 import checkers.gui.PiecePaintStrategy;
@@ -15,10 +14,8 @@ import checkers.model.BoardFactoryCheckers;
  *
  *
  */
-public class Checkers extends JFrame
-{
-   public Checkers(String title)
-   {
+public class Checkers extends JFrame {
+   public Checkers(String title) {
       super(title);
       setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -26,22 +23,26 @@ public class Checkers extends JFrame
       PiecePaintStrategy piecePainter = new PiecePaintStrategyCheckers(board);
 
       BoardPainter boardPaint = new BoardPainter(board, piecePainter);
-      setContentPane(boardPaint);
+
+      // which one is more standard?
+      // setContentPane(boardPaint);
+      add(boardPaint);
 
       pack();
       setVisible(true);
    }
 
-   public static void main(String[] args)
-   {
-      Runnable r = new Runnable()
-                   {
-                      @Override
-                      public void run()
-                      {
-                         new Checkers("Checkers");
-                      }
-                   };
-      EventQueue.invokeLater(r);
+   public static void main(String[] args) {
+
+       Runnable r = new Runnable() {
+           @Override
+           public void run() {
+               new Checkers("Checkers");
+           }
+       };
+
+       // which on is more standard?
+       // EventQueue.invokeLater(r);
+       SwingUtilities.invokeLater(r);
    }
 }

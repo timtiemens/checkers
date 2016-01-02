@@ -16,7 +16,7 @@ public class BoardFactoryCheckers {
         StringBuilder pieces = new StringBuilder();
 
         for (int i = 0; i < numberCheckersPerSide; i++) {
-            String piece = "b";
+            String piece = "B";
             pieces.append(piece);
         }
         for (int i = 0; i < numberBlankInMiddle; i++) {
@@ -24,7 +24,7 @@ public class BoardFactoryCheckers {
             pieces.append(piece);
         }
         for (int i = 0; i < numberCheckersPerSide; i++) {
-            String piece = "r";
+            String piece = "R";
             pieces.append(piece);
         }
 

@@ -1,5 +1,6 @@
 package checkers.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -67,17 +68,28 @@ public class BoardPainter extends JComponent {
     private void paintCheckerBoard(Graphics g) {
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                           RenderingHints.VALUE_ANTIALIAS_ON);
+        // AWESOME: if you setRenderingHints, then there is a chance that
+        //          the 1st square will stay black until a refresh!!!
+        // This "useless" fillRect() stops that bug from showing.
+        g.fillRect(0, 0, 1, 1);
+        // Bug from 2006: https://bugs.openjdk.java.net/browse/JDK-6468831
+        // Bug from 2009: https://bugs.openjdk.java.net/browse/JDK-6808062
+        // If you don't set the Hints, then the "K" does not show up on king pieces
+
 
         final int squareSize = getSquareSize();
+
         for (Point point : board.generatePointsTopDownLeftRight()) {
             int gx = (point.x - 1) * squareSize;
             int gy = (point.y - 1) * squareSize;
-            g.setColor(piecePainter.getColorForPoint(point));
+            Color color = piecePainter.getColorForPoint(point);
+            g.setColor(color);
             g.fillRect(gx, gy, squareSize, squareSize);
         }
     }
 
     private void paintPieces(Graphics g) {
+
 
         paintPiecesNotBeingDragged(g);
 

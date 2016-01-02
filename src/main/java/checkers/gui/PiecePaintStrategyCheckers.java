@@ -13,6 +13,11 @@ import checkers.model.Piece;
 
 public class PiecePaintStrategyCheckers implements PiecePaintStrategy {
     private final Board board;
+
+    // The rules say that pieces go on the dark squares.
+    // But then the black pieces do not show up as well.
+    private final boolean piecesOnDark = true;
+
     public PiecePaintStrategyCheckers(Board b) {
         board = b;
     }
@@ -22,11 +27,18 @@ public class PiecePaintStrategyCheckers implements PiecePaintStrategy {
         Square square = board.getSquare(point);
 
         // The official rules say pieces go on dark.
-        // But this implementation puts them on light.
         if (square.equalsType(Square.NOT_IN_PLAY)) {
-            return Color.BLACK;
+            if (piecesOnDark) {
+                return Color.WHITE;
+            } else {
+                return Color.BLACK;
+            }
         } else if (square.equalsType(Square.IN_PLAY)) {
-            return Color.WHITE;
+            if (piecesOnDark) {
+                return Color.BLACK;
+            } else {
+                return Color.WHITE;
+            }
         } else {
             throw new RuntimeException("cannot get color for point=" + point + " square=" + square);
         }
@@ -53,7 +65,7 @@ public class PiecePaintStrategyCheckers implements PiecePaintStrategy {
         return Color.WHITE;
     }
 
-    public Color getColorForKingMaker() {
+    public Color getColorForKingMarker() {
         return Color.WHITE;
     }
 
@@ -69,7 +81,8 @@ public class PiecePaintStrategyCheckers implements PiecePaintStrategy {
         g.drawOval(x,  y, pieceSize, pieceSize);
 
         if (getChecker(piece).isKing()) {
-            g.setColor(getColorForKingMaker());
+            Color c = getColorForKingMarker();
+            g.setColor(c);
             final String marker = "K";
 
             // adjust cx, cy for size of the "K"
